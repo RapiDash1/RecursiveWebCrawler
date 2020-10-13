@@ -1,8 +1,17 @@
 const request = require("request");
 const jsdom = require("jsdom");
 
+let baseWebsite = "https://medium.com/";
 let websiteMap = new Map();
-let websitedToVisit = ["https://medium.com/"];
+let websitesToVisit = [baseWebsite];
+let visited = new Set();
+let maxConcurrentRequests = 5;
+let concurrentRequests = 0;
+
+/**
+  * @desc Test
+*/
+let limitDepth = 10;
 
 function linkInfo() {
     this.count = 1;
@@ -30,23 +39,53 @@ function addParamsToLink(link, paramsString) {
 function addLinkToWebsiteMap(link) {
     websiteMap.set(link, new linkInfo()); 
 }
+
+function makeConcurrentRequests() {
+    concurrentRequests--;
+    while (concurrentRequests < maxConcurrentRequests && websitesToVisit.length > 0) {
+        concurrentRequests++;
+        crawl();
+    }
+}
+
+function makeRequest() {
+    const url = websitesToVisit.pop();
+    request.get(url, function(err, res, body) {
+        if (err) console.error(err);
+        const dom = new jsdom.JSDOM(body);
+        dom.window.document.querySelectorAll("a").forEach(linkElement => {
+            let link = linkElement.href;
+            if (link.startsWith(baseWebsite)) {
+                let splitLinkInfo = link.split("?");
+                let baseLink = splitLinkInfo[0];
+
+                if (splitLinkInfo.length > 1 && websiteMap.has(baseLink)) addParamsToLink(baseLink, splitLinkInfo[1]);
+                else addLinkToWebsiteMap(baseLink);
+
+                if (!visited.has(link)) {
+                    websitesToVisit.push(link);
+                    visited.add(link);
+                }
+            }
+        });
+        makeConcurrentRequests();
+    });
+}
+
+let test = 0;
+
 /**
   * @desc crawls website
 */
 function crawl() {
-    if (websitedToVisit.length > 0) {
-        const url = websitedToVisit.pop();
-        request.get(url, function(drr, res, body) {
-            const dom = new jsdom.JSDOM(body);
-            dom.window.document.querySelectorAll("a").forEach(linkElement => {
-                let link = linkElement.href;
-                let splitLinkInfo = link.split("?");
-                let baseLink = splitLinkInfo[0];
-                if (websiteMap.has(baseLink)) addParamsToLink(baseLink, splitLinkInfo[1]);
-                else addLinkToWebsiteMap(baseLink);
-            });
-            console.log(websiteMap);
-        });
+    if (test >= limitDepth) {
+        console.log(websiteMap);
+        return;
+    }
+    
+    test += 1
+    if (websitesToVisit.length > 0) {
+        setTimeout(makeRequest, 500);
     }
 }
 
