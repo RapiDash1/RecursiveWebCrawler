@@ -2,7 +2,7 @@
   "name": "recursivewebcrawler",
   "version": "1.0.0",
   "description": "",
-  "main": "db.js",
+  "main": "crawler.js",
   "dependencies": {
     "jsdom": "^16.4.0",
     "redis": "^3.0.2",
@@ -10,6 +10,6 @@
   },
   "devDependencies": {},
   "scripts": {
-    "start": "node db.js"
+    "start": "node crawler.js"
   }
 }
