@@ -19,7 +19,7 @@ let concurrentRequests = 0;
 /**
   * @desc limitDepth, used only for testing
 */
-let limitDepth = 4;
+let limitDepth = 5;
 
 
 /**
@@ -41,7 +41,7 @@ function getParams(webInfoString) {
 */
 function saveParamsToLink(link, paramsString) {
     let params = getParams(paramsString);
-    websiteMap[link].count += 1;
+    websiteMap[link].references += 1;
     params.forEach(param => {
         websiteMap[link].params.add(param);
     });

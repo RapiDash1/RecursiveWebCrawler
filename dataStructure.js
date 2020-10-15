@@ -2,7 +2,7 @@
   * @desc Information to be stored per link
 */
 function linkInfo() {
-    this.count = 1;
+    this.references = 1;
     this.params = new Set();
 }
 
@@ -19,10 +19,10 @@ function displayUrlInfo(urlInfo) {
   * @desc Serialize url info so that it can be stored in database
 */
 function serializeUrlInfo(urlInfo) {
-    return JSON.stringify({
-        client: urlInfo.client, 
-        params: [...urlInfo.params]
-    });
+  return JSON.stringify({
+    "references": urlInfo.references, 
+    "params": [...urlInfo.params]
+  });
 }
 
 module.exports = {linkInfo, displayUrlInfo, serializeUrlInfo};

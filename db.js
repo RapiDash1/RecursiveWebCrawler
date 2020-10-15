@@ -1,5 +1,5 @@
 const redis = require("redis");
-const client = redis.createClient({host: "172.17.0.5"});
+const client = redis.createClient({host: "redis-server"});
  
 client.on("error", function(error) {
   console.error(error);

@@ -22,11 +22,16 @@ To get a local copy up and running follow these simple example steps.
 - Clone this repo to your local machine.
 
 ### Usage
-- To run the web app, simply paste the following code in your terminal, replace  `<your_image_name>` and `<your_app_name>`  with your preferred names and hit enter.
+- To run the web app, simply paste the following code in your terminal.
     ```bash
-    docker build -t <your_image_name>/<your_app_name)> .; docker run <your_image_name>/<your_app_name)>
+    docker-compose up
     ```
 - Wait for crawling to finish and have fun 😊.
+- To exit the web app, simply paste the following code in your terminal.
+    ```bash
+    docker-compose down
+    ```
+
 
 ---
 
