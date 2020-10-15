@@ -1,6 +1,6 @@
 # RecursiveWebCrawler
 
-Recursively crawls a website and stores all unique urls, number of times it has been referenced and parameters associated with it in Redis. Crawling happens asynchronously and concurrently through 5 channels.
+Recursively crawls a website and stores all unique urls, number of times it has been referenced and parameters associated with it in Redis. Crawling happens asynchronously and concurrently through multiple channels.
 
 ## Preview
 
