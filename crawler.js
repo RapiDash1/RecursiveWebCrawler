@@ -1,18 +1,17 @@
-const request = require("request");
-const jsdom = require("jsdom");
 const db = require("./db");
-const {linkInfo, displayUrlInfo, serializeUrlInfo} = require("./dataStructure");
+const jsdom = require("jsdom");
+const request = require("request");
+const {config} = require("./config");
 const {urlBelongsToBaseWebsite} = require("./helpers");
+const {linkInfo, displayUrlInfo, serializeUrlInfo} = require("./dataStructure");
 
 
 /**
   * @desc Init
 */
-let baseWebsite = "https://medium.com/";
 let websiteMap = {};
-let websitesToVisit = [baseWebsite];
+let websitesToVisit = [config.baseWebsite];
 let visited = new Set();
-let maxConcurrentRequests = 5;
 let concurrentRequests = 0;
 
 
@@ -62,7 +61,7 @@ function addLinkToWebsiteMap(link) {
 */
 function makeConcurrentRequests() {
     concurrentRequests--;
-    while (concurrentRequests < maxConcurrentRequests && websitesToVisit.length > 0) {
+    while (concurrentRequests < config.maxConcurrentRequests && websitesToVisit.length > 0) {
         concurrentRequests++;
         crawl();
     }
