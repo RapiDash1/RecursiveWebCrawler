@@ -96,17 +96,22 @@ function makeRequest() {
     });
 }
 
+function printUrlInfoAndReturn() {
+    db.printUrlInfo(displayUrlInfo);
+    return;
+}
+
 
 /**
   * @desc crawls website
 */
 function crawl() {
+    if (config.maxWebsitesToVisit != -1) {
+      if (noOfCrawls >= config.maxWebsitesToVisit) return printUrlInfoAndReturn();
+    }
     printCrawlInfoToConsole(noOfCrawls);
     noOfCrawls += 1
-    if (websitesToVisit.length == 0) {
-        db.printUrlInfo(displayUrlInfo);
-        return;
-    }
+    if (websitesToVisit.length == 0) return printUrlInfoAndReturn();
     setTimeout(makeRequest, config.requestWaitTime);
 }
 
