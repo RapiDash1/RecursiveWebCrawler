@@ -2,7 +2,12 @@ const request = require("request");
 const jsdom = require("jsdom");
 const db = require("./db");
 const {linkInfo, displayUrlInfo, serializeUrlInfo} = require("./dataStructure");
+const {urlBelongsToBaseWebsite} = require("./helpers");
 
+
+/**
+  * @desc Init
+*/
 let baseWebsite = "https://medium.com/";
 let websiteMap = {};
 let websitesToVisit = [baseWebsite];
@@ -10,11 +15,16 @@ let visited = new Set();
 let maxConcurrentRequests = 5;
 let concurrentRequests = 0;
 
-/**
-  * @desc Test
-*/
-let limitDepth = 400;
 
+/**
+  * @desc limitDepth, used only for testing
+*/
+let limitDepth = 4;
+
+
+/**
+  * @desc converts substring of url to a list of parameters
+*/
 function getParams(webInfoString) {
     let params = [];
     let paramsInfo = webInfoString.split("&");
@@ -25,18 +35,31 @@ function getParams(webInfoString) {
     return params;
 }
 
-function addParamsToLink(link, paramsString) {
+
+/**
+  * @desc Adds/Updates params to websiteMap and saves key value to database 
+*/
+function saveParamsToLink(link, paramsString) {
     let params = getParams(paramsString);
     websiteMap[link].count += 1;
     params.forEach(param => {
         websiteMap[link].params.add(param);
     });
+    db.setKeyValueToDb(link, serializeUrlInfo(websiteMap[link]));
 }
 
+
+/**
+  * @desc Add link to websiteMap with default value
+*/
 function addLinkToWebsiteMap(link) {
     websiteMap[link] = new linkInfo(); 
 }
 
+
+/**
+  * @desc Managing concurrentRequests so that max requests possible is maxConcurrentRequests
+*/
 function makeConcurrentRequests() {
     concurrentRequests--;
     while (concurrentRequests < maxConcurrentRequests && websitesToVisit.length > 0) {
@@ -45,6 +68,10 @@ function makeConcurrentRequests() {
     }
 }
 
+
+/**
+  * @desc Make request to a website and get websites associated with it
+*/
 function makeRequest() {
     const url = websitesToVisit.pop();
     request.get(url, function(err, res, body) {
@@ -52,13 +79,13 @@ function makeRequest() {
         const dom = new jsdom.JSDOM(body);
         dom.window.document.querySelectorAll("a").forEach(linkElement => {
             let link = linkElement.href;
-            if (link.search(/https:\/\/[a-zA-Z.]*medium.com\/.*/i) != -1) {
-                let splitLinkInfo = link.split("?");
-                let baseLink = splitLinkInfo[0];
-                if (splitLinkInfo.length > 1 && websiteMap.hasOwnProperty(baseLink)) {
-                    addParamsToLink(baseLink, splitLinkInfo[1]);
+            if (urlBelongsToBaseWebsite(link)) {
+                let [baseUrl, paramsString] = [...link.split("?")];
+                if ((paramsString !== undefined) && websiteMap.hasOwnProperty(baseUrl)) {
+                    saveParamsToLink(baseUrl, paramsString);
                 }
-                else addLinkToWebsiteMap(baseLink);
+                else addLinkToWebsiteMap(baseUrl);
+                // Dont's visit page that has already been visited
                 if (!visited.has(link)) {
                     websitesToVisit.push(link);
                     visited.add(link);
@@ -71,26 +98,25 @@ function makeRequest() {
 
 let test = 0;
 
+
 /**
   * @desc crawls website
 */
 function crawl() {
     if (test >= limitDepth) {
         console.log("Length: "+Object.keys(websiteMap).length);
-        Object.keys(websiteMap).forEach(baseUrl => {
-            let urlInfo = websiteMap[baseUrl];
-            if (urlInfo) {
-                db.setKeyValueToDb(baseUrl, serializeUrlInfo(urlInfo));
-            }
-        });
         db.printUrlInfo(displayUrlInfo);
         return;
     }
     
     test += 1
     if (websitesToVisit.length > 0) {
+        // Timeout to reduce load on website and not get blocked
         setTimeout(makeRequest, 300);
     }
 }
 
+/**
+  * @desc main
+*/
 crawl();
