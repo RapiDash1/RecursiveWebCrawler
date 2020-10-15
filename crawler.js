@@ -101,18 +101,13 @@ function makeRequest() {
   * @desc crawls website
 */
 function crawl() {
-  printCrawlInfoToConsole(noOfCrawls);
+    printCrawlInfoToConsole(noOfCrawls);
     noOfCrawls += 1
-    if (noOfCrawls == limitNoOfCrawls+config.maxConcurrentRequests) {
+    if (websitesToVisit.length == 0) {
         db.printUrlInfo(displayUrlInfo);
         return;
     }
-    else if (noOfCrawls < limitNoOfCrawls) {
-      if (websitesToVisit.length > 0) {
-        // Timeout to reduce load on website and not get blocked
-        setTimeout(makeRequest, 300);
-      }
-    }
+    setTimeout(makeRequest, config.requestWaitTime);
 }
 
 

@@ -20,8 +20,8 @@ function displayUrlInfo(urlInfo) {
 */
 function serializeUrlInfo(urlInfo) {
   return JSON.stringify({
-    "references": urlInfo.references, 
-    "params": [...urlInfo.params]
+    references: urlInfo.references, 
+    params: [...urlInfo.params]
   });
 }
 

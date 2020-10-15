@@ -8,7 +8,7 @@ function urlBelongsToBaseWebsite(url) {
 
 function printCrawlInfoToConsole(noOfCrawls) {
     if (noOfCrawls == 0) console.log("Started crawling, please sit back enjoy");
-    else if (noOfCrawls%10 == 0) console.log("Crawling...... No Of websites crawled: "+noOfCrawls);
+    else if (noOfCrawls%30 == 0) console.log("Crawling...... No Of websites crawled: "+noOfCrawls);
 }
 
 module.exports = {urlBelongsToBaseWebsite, printCrawlInfoToConsole};
