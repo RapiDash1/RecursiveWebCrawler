@@ -2,23 +2,24 @@ const db = require("./db");
 const jsdom = require("jsdom");
 const request = require("request");
 const {config} = require("./config");
-const {urlBelongsToBaseWebsite} = require("./helpers");
+const {urlBelongsToBaseWebsite, printCrawlInfoToConsole} = require("./helpers");
 const {linkInfo, displayUrlInfo, serializeUrlInfo} = require("./dataStructure");
 
 
 /**
   * @desc Init
 */
+let noOfCrawls = 0;
 let websiteMap = {};
-let websitesToVisit = [config.baseWebsite];
 let visited = new Set();
 let concurrentRequests = 0;
+let websitesToVisit = [config.baseWebsite];
 
 
 /**
-  * @desc limitDepth, used only for testing
+  * @desc limitNoOfCrawls, used only for testing
 */
-let limitDepth = 5;
+let limitNoOfCrawls = 30;
 
 
 /**
@@ -95,25 +96,25 @@ function makeRequest() {
     });
 }
 
-let test = 0;
-
 
 /**
   * @desc crawls website
 */
 function crawl() {
-    if (test >= limitDepth) {
-        console.log("Length: "+Object.keys(websiteMap).length);
+  printCrawlInfoToConsole(noOfCrawls);
+    noOfCrawls += 1
+    if (noOfCrawls == limitNoOfCrawls+config.maxConcurrentRequests) {
         db.printUrlInfo(displayUrlInfo);
         return;
     }
-    
-    test += 1
-    if (websitesToVisit.length > 0) {
+    else if (noOfCrawls < limitNoOfCrawls) {
+      if (websitesToVisit.length > 0) {
         // Timeout to reduce load on website and not get blocked
         setTimeout(makeRequest, 300);
+      }
     }
 }
+
 
 /**
   * @desc main
