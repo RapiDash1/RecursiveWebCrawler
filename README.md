@@ -25,7 +25,7 @@ To get a local copy up and running follow these simple example steps.
     - [Dowload and Install](https://www.docker.com/products/docker-desktop) Docker for running this web app.
 - Clone this repo to your local machine.
 - In `config.js`, change configurations according to your preferance.
-    <img src = "images/config.PNG" width = "300">
+    - <img src = "images/config.PNG" width = "300">
 
 ### Usage
 - To run the web app, simply paste the following code in your terminal.
